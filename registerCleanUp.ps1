@@ -3,12 +3,19 @@ $scriptPath = "C:\scripts\CleanProfiles.ps1"
 
 # Obsah čisticího skriptu
 $scriptContent = @"
+# Získejte seznam aktuálně přihlášených uživatelů
+`$loggedInUsers = Get-WmiObject -Class Win32_ComputerSystem | Select-Object -ExpandProperty UserName
+
 Get-WmiObject Win32_UserProfile | Where-Object {
-    `$_.Special -eq `$false -and `$_.LocalPath -notmatch 'C:\\Users\\admin' -and `$_.LocalPath -notmatch 'C:\\Users\\admin1'
+    `$_ .Special -eq `$_ false -and
+    `$_ .LocalPath -notmatch 'C:\\Users\\admin' -and
+    `$_ .LocalPath -notmatch 'C:\\Users\\admin1' -and
+    `$loggedInUsers -notcontains `$_ .LocalPath.Split('\\')[-1]
 } | ForEach-Object {
     Remove-WmiObject `$_
 }
 "@
+
 
 # Vytvoření čisticího skriptu
 Set-Content -Path $scriptPath -Value $scriptContent
